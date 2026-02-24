@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMI ESUCAR · Acceso</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--verde:#1a6b3a;--verde-n:#3ecf74;--dorado:#c9a227;--oscuro:#0d1117;--medio:#161b22;--borde:#21292e;--texto:#8b949e;--blanco:#e6edf3;--rojo:#e74c3c;--azul:#3498db;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--oscuro);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+  .bg{position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(26,107,58,.15) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(201,162,39,.08) 0%,transparent 50%);pointer-events:none;}
+  .card{background:var(--medio);border:1px solid var(--borde);border-radius:16px;padding:40px 36px;width:100%;max-width:400px;position:relative;box-shadow:0 24px 64px rgba(0,0,0,.5);}
+  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--verde),var(--dorado));border-radius:16px 16px 0 0;}
+  .logo{display:flex;align-items:center;gap:14px;margin-bottom:28px;justify-content:center;}
+  .logo img{width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(201,162,39,.5));}
+  .logo-text h1{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;line-height:1;color:var(--blanco);}
+  .logo-text p{font-size:10px;color:var(--texto);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+  .divider{height:1px;background:var(--borde);margin-bottom:24px;}
+  .form-group{margin-bottom:18px;}
+  label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--texto);font-weight:600;margin-bottom:7px;}
+  input{width:100%;background:var(--oscuro);border:1px solid var(--borde);border-radius:7px;padding:11px 14px;color:var(--blanco);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color .2s;}
+  input:focus{outline:none;border-color:var(--verde);}
+  input::placeholder{color:rgba(139,148,158,.5);}
+  .btn-login{width:100%;background:var(--verde);border:none;color:#fff;padding:12px;border-radius:7px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;cursor:pointer;transition:opacity .2s,transform .1s;margin-top:8px;}
+  .btn-login:hover{opacity:.9;transform:translateY(-1px);}
+  .btn-login:active{transform:translateY(0);}
+  .error{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.3);color:var(--rojo);border-radius:6px;padding:9px 12px;font-size:12px;margin-bottom:16px;display:none;}
+  .roles-info{margin-top:22px;background:var(--oscuro);border:1px solid var(--borde);border-radius:8px;padding:12px 14px;}
+  .roles-info p{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--texto);font-weight:600;margin-bottom:8px;}
+  .role-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:11px;color:var(--texto);}
+  .role-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .loading{display:none;text-align:center;color:var(--texto);font-size:12px;margin-top:8px;}
+  .spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--borde);border-top-color:var(--verde);border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="card">
+  <div class="logo">
+    <img src="/static/escudo.png" alt="Escudo ESUCAR" onerror="this.style.display='none'">
+    <div class="logo-text">
+      <h1>CMI · ESUCAR</h1>
+      <p>Plan de Desarrollo Educativo 2025–2028</p>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="error" id="errorMsg"></div>
+  <div class="form-group">
+    <label>Usuario</label>
+    <input type="text" id="username" placeholder="Ingrese su usuario" autocomplete="username">
+  </div>
+  <div class="form-group">
+    <label>Contraseña</label>
+    <input type="password" id="password" placeholder="Ingrese su contraseña" autocomplete="current-password"
+           onkeydown="if(event.key==='Enter') doLogin()">
+  </div>
+  <button class="btn-login" onclick="doLogin()">INGRESAR AL SISTEMA</button>
+  <div class="loading" id="loading"><span class="spinner"></span>Verificando credenciales...</div>
+
+  <div class="roles-info">
+    <p>Usuarios por defecto (cambiar en producción)</p>
+    <div class="role-row"><div class="role-dot" style="background:#6a1b9a"></div><b style="color:#9c27b0">auditor</b> / auditor2025 · Auditor OAC</div>
+    <div class="role-row"><div class="role-dot" style="background:#1565c0"></div><b style="color:#3498db">director</b> / director2025 · Dirección</div>
+    <div class="role-row"><div class="role-dot" style="background:#1a8a4a"></div><b style="color:#3ecf74">resp_e1</b>…<b style="color:#3ecf74">resp_e5</b> / resp2025 · Responsables</div>
+  </div>
+</div>
+
+<script>
+async function doLogin() {
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value;
+  const err = document.getElementById('errorMsg');
+  const load = document.getElementById('loading');
+  err.style.display='none';
+  if(!u||!p){err.textContent='Complete usuario y contraseña.';err.style.display='block';return;}
+  load.style.display='block';
+  try {
+    const r = await fetch('/api/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username:u,password:p})
+    });
+    const d = await r.json();
+    load.style.display='none';
+    if(d.ok) { window.location.href='/'; }
+    else { err.textContent=d.error||'Credenciales incorrectas.'; err.style.display='block'; }
+  } catch(e) {
+    load.style.display='none';
+    err.textContent='Error de conexión con el servidor.'; err.style.display='block';
+  }
+}
+</script>
+</body>
+</html>

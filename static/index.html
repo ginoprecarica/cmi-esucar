@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMI – ESUCAR 2025-2028</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--verde:#1a6b3a;--verde-n:#3ecf74;--dorado:#c9a227;--oscuro:#0d1117;--medio:#161b22;--borde:#21292e;--texto:#8b949e;--blanco:#e6edf3;--rojo:#e74c3c;--amarillo:#f39c12;--azul:#3498db;}
+  *{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+  body{background:var(--oscuro);color:var(--blanco);font-family:'DM Sans',sans-serif;font-size:14px;min-height:100vh;}
+  /* HEADER */
+  .header{background:linear-gradient(135deg,var(--medio) 0%,#0a1f12 100%);border-bottom:2px solid var(--verde);padding:14px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:200;box-shadow:0 4px 24px rgba(0,0,0,.6);}
+  .header img{width:52px;height:52px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(201,162,39,.6));flex-shrink:0;}
+  .h-title{flex:1;}
+  .h-title h1{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;line-height:1;}
+  .h-title p{font-size:10px;color:var(--texto);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+  .h-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .yr-sel{display:flex;gap:5px;background:var(--medio);border:1px solid var(--borde);padding:3px;border-radius:7px;}
+  .btn-yr{background:transparent;border:1px solid transparent;color:var(--texto);padding:4px 11px;border-radius:5px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;transition:all .15s;}
+  .btn-yr:hover,.btn-yr.active{background:var(--verde);color:#fff;}
+  .badge-yr{background:var(--verde);color:#fff;font-family:'DM Mono',monospace;font-size:11px;padding:4px 10px;border-radius:4px;}
+  .user-chip{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.05);border:1px solid var(--borde);border-radius:6px;padding:5px 10px;font-size:12px;}
+  .user-chip .rol-dot{width:8px;height:8px;border-radius:50%;}
+  .btn-logout{background:transparent;border:1px solid rgba(231,76,60,.3);color:var(--rojo);padding:4px 10px;border-radius:5px;cursor:pointer;font-size:11px;transition:all .15s;}
+  .btn-logout:hover{background:rgba(231,76,60,.1);}
+  /* AUDITOR BAR */
+  .aud-bar{background:linear-gradient(90deg,rgba(52,152,219,.1),rgba(52,152,219,.03));border:1px solid rgba(52,152,219,.2);border-radius:8px;padding:10px 16px;display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap;}
+  .aud-bar .icon{font-size:20px;flex-shrink:0;}
+  .aud-info{flex:1;}
+  .aud-info strong{color:var(--azul);font-size:13px;}
+  .aud-info p{font-size:11px;color:var(--texto);margin-top:1px;}
+  .aud-stats{display:flex;gap:14px;flex-wrap:wrap;}
+  .a-stat{text-align:center;}
+  .a-val{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1;}
+  .a-lbl{font-size:9px;color:var(--texto);text-transform:uppercase;letter-spacing:1px;}
+  /* KPI */
+  .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:18px;}
+  .kpi-card{background:var(--medio);border:1px solid var(--borde);border-radius:9px;padding:14px;position:relative;overflow:hidden;transition:transform .15s;}
+  .kpi-card:hover{transform:translateY(-2px);}
+  .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ce);}
+  .kpi-eje{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--texto);margin-bottom:6px;}
+  .kpi-val{font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:1;color:var(--ce);}
+  .kpi-lbl{font-size:11px;color:var(--texto);margin-top:3px;}
+  .kpi-bar{margin-top:8px;background:var(--oscuro);border-radius:99px;height:4px;overflow:hidden;}
+  .kpi-fill{height:100%;border-radius:99px;background:var(--ce);transition:width .8s;}
+  /* ALERTAS */
+  .alertas{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px;}
+  .alerta{display:flex;align-items:center;gap:7px;padding:7px 13px;border-radius:6px;font-size:12px;font-weight:500;border:1px solid;flex:1;min-width:160px;}
+  .a-r{background:rgba(231,76,60,.07);border-color:rgba(231,76,60,.3);color:#e74c3c;}
+  .a-y{background:rgba(243,156,18,.07);border-color:rgba(243,156,18,.3);color:#f39c12;}
+  .a-g{background:rgba(62,207,116,.07);border-color:rgba(62,207,116,.3);color:#3ecf74;}
+  .a-b{background:rgba(52,152,219,.07);border-color:rgba(52,152,219,.3);color:#3498db;}
+  /* TABS */
+  .tabs{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:0;}
+  .tab{padding:7px 14px;border-radius:6px 6px 0 0;cursor:pointer;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;border:1px solid var(--borde);border-bottom:none;background:var(--oscuro);color:var(--texto);transition:all .15s;}
+  .tab.active{background:var(--medio);color:var(--blanco);border-color:var(--ce);}
+  .eje-panel{display:none;}
+  .eje-panel.active{display:block;}
+  /* EJE HEADER */
+  .eje-hdr{display:flex;align-items:center;gap:12px;padding:13px 18px;background:var(--medio);border:1px solid var(--borde);border-radius:9px 9px 0 0;border-bottom:2px solid var(--ce);}
+  .eje-num{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--ce);line-height:1;}
+  .eje-hdr h2{font-size:14px;font-weight:700;letter-spacing:.5px;}
+  .eje-hdr p{font-size:11px;color:var(--texto);margin-top:2px;}
+  /* PROG ANUAL */
+  .prog-row{display:flex;gap:6px;background:var(--medio);border:1px solid var(--borde);border-top:none;padding:10px 18px;}
+  .prog-item{flex:1;background:var(--oscuro);border:1px solid var(--borde);border-radius:6px;padding:7px 10px;text-align:center;}
+  .prog-yr{font-size:10px;color:var(--texto);font-family:'DM Mono',monospace;}
+  .prog-val{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1;color:var(--ce);}
+  .prog-bar{background:var(--medio);border-radius:99px;height:3px;margin-top:3px;overflow:hidden;}
+  .prog-fill{height:100%;border-radius:99px;background:var(--ce);}
+  /* OBJ CARD */
+  .obj-card{background:var(--medio);border:1px solid var(--borde);border-top:none;}
+  .obj-card:last-child{border-radius:0 0 9px 9px;}
+  .obj-hdr{padding:11px 16px;display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none;transition:background .1s;}
+  .obj-hdr:hover{background:rgba(255,255,255,.02);}
+  .obj-num{font-family:'DM Mono',monospace;font-size:10px;background:var(--oscuro);border:1px solid var(--borde);padding:2px 7px;border-radius:4px;color:var(--ce);flex-shrink:0;}
+  .obj-nombre{flex:1;font-size:13px;font-weight:600;}
+  .obj-cnt{font-size:11px;color:var(--texto);flex-shrink:0;}
+  .obj-av{font-family:'Bebas Neue',sans-serif;font-size:19px;color:var(--ce);flex-shrink:0;}
+  .chev{color:var(--texto);font-size:11px;transition:transform .2s;flex-shrink:0;}
+  .obj-body{display:none;padding:0 16px 14px;}
+  .obj-body.open{display:block;}
+  /* SEMAFORO */
+  .sem{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 9px;border-radius:99px;}
+  .sg{background:rgba(62,207,116,.12);color:#3ecf74;border:1px solid rgba(62,207,116,.3);}
+  .sy{background:rgba(243,156,18,.12);color:#f39c12;border:1px solid rgba(243,156,18,.3);}
+  .sr{background:rgba(231,76,60,.12);color:#e74c3c;border:1px solid rgba(231,76,60,.3);}
+  /* INFO GRID */
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px;}
+  .ib{background:var(--oscuro);border:1px solid var(--borde);border-radius:6px;padding:9px 11px;}
+  .ib-t{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--texto);margin-bottom:5px;font-weight:600;}
+  .rbadge{display:inline-block;background:rgba(255,255,255,.05);border:1px solid var(--borde);padding:2px 7px;border-radius:4px;font-size:10px;white-space:nowrap;margin:2px;}
+  .ind-item{font-size:11px;color:var(--texto);padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+  .ind-item:last-child{border-bottom:none;}
+  .ind-item::before{content:'· ';color:var(--ce);}
+  /* TRIMESTRE TABS */
+  .tr-tabs{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap;}
+  .tr-tab{padding:4px 11px;border-radius:4px;cursor:pointer;font-size:10px;font-weight:600;border:1px solid var(--borde);background:var(--oscuro);color:var(--texto);transition:all .1s;}
+  .tr-tab.active{background:var(--ce);border-color:var(--ce);color:#fff;}
+  .tr-body{display:none;}
+  .tr-body.open{display:block;}
+  /* TAREA */
+  .tarea{background:var(--oscuro);border:1px solid var(--borde);border-radius:7px;padding:9px 12px;margin-bottom:6px;transition:border-color .15s;}
+  .tarea.validada{border-color:rgba(62,207,116,.35);background:rgba(62,207,116,.04);}
+  .tarea.enviada{border-color:rgba(52,152,219,.35);background:rgba(52,152,219,.04);}
+  .tarea.rechazada{border-color:rgba(231,76,60,.35);background:rgba(231,76,60,.04);}
+  .t-row{display:flex;align-items:flex-start;gap:10px;}
+  .t-content{flex:1;}
+  .t-texto{font-size:12px;font-weight:500;margin-bottom:4px;}
+  .t-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+  .t-mes{font-size:10px;font-family:'DM Mono',monospace;color:var(--texto);background:rgba(255,255,255,.05);padding:1px 6px;border-radius:3px;}
+  .t-est{font-size:10px;padding:1px 8px;border-radius:99px;font-weight:600;}
+  .ep{background:rgba(139,148,158,.08);color:var(--texto);border:1px solid var(--borde);}
+  .ee{background:rgba(52,152,219,.1);color:#3498db;border:1px solid rgba(52,152,219,.3);}
+  .ev{background:rgba(62,207,116,.1);color:#3ecf74;border:1px solid rgba(62,207,116,.3);}
+  .er{background:rgba(231,76,60,.1);color:#e74c3c;border:1px solid rgba(231,76,60,.3);}
+  .t-actions{display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;}
+  .btn{font-size:10px;padding:3px 9px;border-radius:4px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border:1px solid;transition:all .1s;white-space:nowrap;}
+  .btn-up{background:rgba(52,152,219,.1);border-color:rgba(52,152,219,.4);color:#3498db;}
+  .btn-up:hover{background:rgba(52,152,219,.22);}
+  .btn-ok{background:rgba(62,207,116,.1);border-color:rgba(62,207,116,.4);color:#3ecf74;}
+  .btn-ok:hover{background:rgba(62,207,116,.22);}
+  .btn-no{background:rgba(231,76,60,.1);border-color:rgba(231,76,60,.4);color:#e74c3c;}
+  .btn-no:hover{background:rgba(231,76,60,.22);}
+  .btn-see{background:rgba(255,255,255,.04);border-color:var(--borde);color:var(--texto);}
+  .btn-see:hover{background:rgba(255,255,255,.09);}
+  /* MODAL */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:500;display:none;align-items:center;justify-content:center;padding:16px;}
+  .modal.open{display:flex;}
+  .mbox{background:var(--medio);border:1px solid var(--borde);border-radius:12px;padding:24px;max-width:500px;width:100%;max-height:85vh;overflow-y:auto;position:relative;}
+  .mbox::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ce,var(--verde));border-radius:12px 12px 0 0;}
+  .m-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:1px;margin-bottom:3px;}
+  .m-sub{font-size:11px;color:var(--texto);margin-bottom:16px;line-height:1.5;}
+  .m-close{position:absolute;top:11px;right:13px;background:none;border:none;color:var(--texto);cursor:pointer;font-size:17px;}
+  .m-close:hover{color:var(--blanco);}
+  .flabel{display:block;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--texto);font-weight:600;margin-bottom:6px;}
+  textarea,select{width:100%;background:var(--oscuro);border:1px solid var(--borde);border-radius:5px;padding:8px 10px;color:var(--blanco);font-family:'DM Sans',sans-serif;font-size:12px;resize:vertical;min-height:70px;margin-bottom:12px;}
+  textarea:focus,select:focus{outline:none;border-color:var(--azul);}
+  .file-row{display:flex;gap:8px;align-items:center;margin-bottom:12px;}
+  .fname{font-size:11px;color:var(--texto);flex:1;font-family:'DM Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .btn-send{background:var(--azul);border:none;color:#fff;padding:8px 18px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:700;transition:opacity .15s;}
+  .btn-send:hover{opacity:.85;}
+  .btn-send.green{background:#2d9a5a;}
+  .btn-send.red{background:#c0392b;}
+  /* HISTORIAL */
+  .hist-item{font-size:11px;color:var(--texto);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:8px;}
+  .hist-date{font-family:'DM Mono',monospace;font-size:10px;flex-shrink:0;}
+  .obs-item{border-left:2px solid;border-radius:0 5px 5px 0;padding:6px 10px;margin-bottom:5px;}
+  /* TOAST */
+  .toast{position:fixed;bottom:24px;right:24px;padding:10px 18px;border-radius:7px;font-size:12px;font-weight:600;z-index:999;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .toast.ok{background:#2d9a5a;color:#fff;}
+  .toast.err{background:#c0392b;color:#fff;}
+  /* PANEL AUDITOR */
+  .pend-auditoria{background:var(--medio);border:1px solid rgba(52,152,219,.25);border-radius:9px;padding:14px;margin-bottom:18px;}
+  .pa-title{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--azul);font-weight:600;margin-bottom:10px;}
+  .pa-item{background:var(--oscuro);border:1px solid var(--borde);border-radius:6px;padding:9px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+  .pa-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--texto);background:rgba(255,255,255,.05);padding:2px 6px;border-radius:3px;flex-shrink:0;}
+  .pa-desc{flex:1;font-size:11px;}
+  .pa-fecha{font-size:10px;color:var(--texto);font-family:'DM Mono',monospace;flex-shrink:0;}
+  /* CONTAINER */
+  .container{max-width:1420px;margin:0 auto;padding:22px 20px;}
+  ::-webkit-scrollbar{width:5px;height:5px;}
+  ::-webkit-scrollbar-track{background:var(--oscuro);}
+  ::-webkit-scrollbar-thumb{background:var(--borde);border-radius:99px;}
+  @media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.info-grid{grid-template-columns:1fr;}}
+  @media(max-width:600px){.kpi-grid{grid-template-columns:1fr;}.header{flex-wrap:wrap;gap:8px;}}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <img src="/static/escudo.png" alt="Escudo ESUCAR">
+  <div class="h-title">
+    <h1>Cuadro de Mando Integral · ESUCAR</h1>
+    <p>Escuela de Suboficiales "SOM Fabriciano González Urzúa" · PDE 2025–2028</p>
+  </div>
+  <div class="h-right">
+    <div class="yr-sel" id="yrSel">
+      <button class="btn-yr active" onclick="setYear(2025,this)">2025</button>
+      <button class="btn-yr" onclick="setYear(2026,this)">2026</button>
+      <button class="btn-yr" onclick="setYear(2027,this)">2027</button>
+      <button class="btn-yr" onclick="setYear(2028,this)">2028</button>
+    </div>
+    <div class="badge-yr" id="badgeYr">2025</div>
+    <div class="user-chip" id="userChip">
+      <div class="rol-dot" id="rolDot" style="background:#888"></div>
+      <span id="userNombre">Cargando...</span>
+      <span id="userRol" style="font-size:10px;color:var(--texto)"></span>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">Salir</button>
+  </div>
+</header>
+
+<!-- MODAL -->
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="mbox" id="mbox" style="--ce:var(--verde)">
+    <button class="m-close" onclick="closeModal()">✕</button>
+    <div id="mContent"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<div class="container">
+
+  <!-- PANEL PENDIENTES AUDITORÍA (solo auditor) -->
+  <div id="auditPendPanel" style="display:none">
+    <div class="pend-auditoria">
+      <div class="pa-title">🔍 Evidencias pendientes de validación — Of. Aseguramiento de la Calidad</div>
+      <div id="pendList"><span style="font-size:12px;color:var(--texto)">Sin evidencias pendientes.</span></div>
+    </div>
+  </div>
+
+  <!-- BARRA AUDITOR -->
+  <div class="aud-bar">
+    <div class="icon">🔍</div>
+    <div class="aud-info">
+      <strong>Auditor: Oficina de Aseguramiento de la Calidad</strong>
+      <p>Los responsables suben evidencia por tarea → el auditor valida o rechaza con observaciones → el estado se actualiza en tiempo real.</p>
+    </div>
+    <div class="aud-stats" id="audStats"></div>
+  </div>
+
+  <!-- KPI GRID -->
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <!-- ALERTAS -->
+  <div class="alertas" id="alertas"></div>
+
+  <!-- TABS -->
+  <div class="tabs" id="ejeTabs"></div>
+
+  <!-- PANELES -->
+  <div id="ejePaneles"></div>
+
+  <footer style="margin-top:24px;padding:12px 0;border-top:1px solid var(--borde);display:flex;justify-content:space-between;color:var(--texto);font-size:11px;">
+    <span>CMI-ESUCAR-2025-2028 · v2.0 · Sistema de Evidencias y Auditoría</span>
+    <span id="fechaPie"></span>
+  </footer>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// CONFIG / ESTADO
+// ══════════════════════════════════════════════════════
+let CY = 2025;
+let ACTIVE_EJE = 0;
+let ME = null;
+let TAREAS_DB = {}; // tarea_key → estado from server
+
+const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const ROL_COLOR={responsable:'#3ecf74',auditor:'#9c27b0',direccion:'#3498db'};
+
+// ══════════════════════════════════════════════════════
+// DATA EJES (igual que versión anterior, sin avance hardcoded)
+// ══════════════════════════════════════════════════════
+const EJES=[
+  {id:'E1',num:'I',nombre:'Docencia y Formación',color:'#1a8a4a',icon:'📚',
+   objetivos:[
+    {id:'OE1',nombre:'Implementar Biblioteca Virtual',responsable:['Jef. Estudio','Bibliotecólogos'],indicadores:['N° títulos digitales disponibles','% Usuarios activos/mes','N° accesos plataforma/mes'],semaforo:{2025:'verde',2026:'amarillo',2027:'amarillo',2028:'rojo'},
+     tareas:{2025:[{mes:0,t:'Desarrollar proyecto plataforma biblioteca virtual y asignar equipo'},{mes:1,t:'Diseñar arquitectura de la plataforma web responsiva'},{mes:2,t:'Catalogación y clasificación temática inicial de títulos'},{mes:3,t:'Integrar sistema de gestión de usuarios y perfiles'},{mes:4,t:'Aprobación del diseño por mando directivo'},{mes:5,t:'Implementar plataforma en ambiente de prueba'},{mes:6,t:'Crear instructivo de uso para administradores'},{mes:7,t:'Capacitación a docentes en uso de biblioteca virtual'},{mes:8,t:'Lanzamiento oficial plataforma biblioteca virtual'},{mes:9,t:'Primer reporte mensual de uso a Jefatura de Estudio'},{mes:10,t:'Verificar cumplimiento derechos de autor y licencias'},{mes:11,t:'Informe anual de uso y estadísticas'}],2026:[{mes:0,t:'Ampliar catálogo a ≥500 títulos'},{mes:2,t:'Incorporar recursos multimedia'},{mes:5,t:'Evaluación semestral del sistema'},{mes:8,t:'Integración con LMS institucional'},{mes:11,t:'Informe anual y propuestas de mejora'}],2027:[{mes:1,t:'Meta ≥800 títulos en catálogo'},{mes:5,t:'Auditoría de uso y satisfacción'},{mes:10,t:'Implementación sistema de préstamo virtual'}],2028:[{mes:2,t:'Meta ≥1000 títulos en catálogo'},{mes:6,t:'Integración completa LMS'},{mes:11,t:'Informe cierre cuatrienio'}]}},
+    {id:'OE2',nombre:'Evaluar Perfil Ingreso/Egreso',responsable:['Of. Postulaciones','Jef. Estudio'],indicadores:['% Estudiantes con Kardex al ingreso','Promedio calificaciones','% Aprobación fin de carrera'],semaforo:{2025:'verde',2026:'amarillo',2027:'amarillo',2028:'rojo'},
+     tareas:{2025:[{mes:0,t:'Aplicar Test EVALUA y Honey-Alonso a ingresantes'},{mes:1,t:'Caracterizar estudiantes mediante ficha Kardex'},{mes:2,t:'Analizar brechas estilos de aprendizaje'},{mes:5,t:'Informe semestral perfil de ingreso'},{mes:8,t:'Evaluación perfil de egreso con empleadores'},{mes:11,t:'Informe anual perfil ingreso-egreso'}],2026:[{mes:0,t:'Análisis comparativo 3 últimos bienios'},{mes:5,t:'Encuesta a estudiantes 3er y 4to semestre'},{mes:11,t:'Actualización perfil de egreso'}],2027:[{mes:2,t:'Reducir brecha estilos aprendizaje en 25%'},{mes:11,t:'Propuesta ajuste plan de estudios'}],2028:[{mes:4,t:'Encuesta egresados hasta 5 años post-egreso'},{mes:11,t:'Cierre evaluación cuatrienal'}]}},
+    {id:'OE3',nombre:'Homologación y Convalidación',responsable:['Jef. Estudio','UGA'],indicadores:['Instructivo aprobado','% Estudiantes informados','N° convalidaciones procesadas'],semaforo:{2025:'verde',2026:'amarillo',2027:'rojo',2028:'rojo'},
+     tareas:{2025:[{mes:0,t:'Elaborar tabla de equivalencias entre planes de estudio'},{mes:2,t:'Diseñar instructivo de homologación y convalidación'},{mes:4,t:'Aprobación instructivo por mando directivo'},{mes:5,t:'Socialización instructivo a 100% comunidad'},{mes:11,t:'Informe de convalidaciones procesadas año 2025'}],2026:[{mes:1,t:'Proceso de convalidaciones activo'},{mes:8,t:'Revisión anual del instructivo'},{mes:11,t:'Informe anual de convalidaciones'}],2027:[{mes:3,t:'Evaluación impacto del mecanismo'},{mes:9,t:'Exploración convenios con otras IES'}],2028:[{mes:5,t:'Sistema consolidado de convalidaciones'},{mes:11,t:'Informe final cuatrienio'}]}},
+    {id:'OE4',nombre:'Gestión de Personal Docente',responsable:['Of. Docencia','Dirección Plantel'],indicadores:['% Perfiles docentes actualizados','N° capacitaciones/semestre','% Docentes capacitados'],semaforo:{2025:'verde',2026:'amarillo',2027:'amarillo',2028:'rojo'},
+     tareas:{2025:[{mes:0,t:'Revisar y ajustar Perfil Docente ESUCAR'},{mes:1,t:'Actualizar Instructivo del Docente'},{mes:2,t:'Socializar instructivo actualizado a cuerpo docente'},{mes:4,t:'Capacitación N°1: Metodologías activas de aprendizaje'},{mes:7,t:'Capacitación N°2: Evaluación por competencias'},{mes:9,t:'Evaluar desempeño docente 1er ciclo'},{mes:11,t:'Informe anual capacitaciones y desempeño docente'}],2026:[{mes:0,t:'Plan acompañamiento docente activado'},{mes:3,t:'Jornada N°1 intercambio experiencias'},{mes:11,t:'Evaluación satisfacción docente'}],2027:[{mes:2,t:'Implementar comunidades de práctica pedagógica'},{mes:11,t:'Reconocimiento institucional docentes destacados'}],2028:[{mes:3,t:'Sistema evaluación docente consolidado'},{mes:11,t:'Informe final gestión docente cuatrienio'}]}}
+   ]},
+  {id:'E2',num:'II',nombre:'Gestión y Recursos',color:'#1565c0',icon:'🏛',
+   objetivos:[
+    {id:'OE5',nombre:'Mejorar Comunicación Interna',responsable:['Subdirector Académico'],indicadores:['N° encuestas satisfacción/año','N° reuniones informativas/año','N° ediciones boletín docente'],semaforo:{2025:'amarillo',2026:'amarillo',2027:'rojo',2028:'rojo'},
+     tareas:{2025:[{mes:0,t:'Implementar sistema de encuestas online comunidad'},{mes:1,t:'Crear boletín docente digital (1ra edición)'},{mes:2,t:'Reunión informativa N°1 personal e instructores'},{mes:5,t:'1ra encuesta satisfacción comunicación interna'},{mes:6,t:'Fortalecer redes sociales y página web'},{mes:8,t:'Jornada capacitación jefes de oficina'},{mes:10,t:'Crear espacio virtual colaborativo de ideas'},{mes:11,t:'Memoria anual de gestión institucional'}],2026:[{mes:1,t:'Lanzar portal colaborativo institucional'},{mes:11,t:'Informe anual comunicación interna'}],2027:[{mes:2,t:'Auditoría efectividad comunicación'}],2028:[{mes:11,t:'Informe final comunicación cuatrienio'}]}},
+    {id:'OE6',nombre:'Personal de Apoyo',responsable:['Subdirector Académico','Dirección'],indicadores:['% dotación óptima cubierta','N° cargos creados','% Personal integrado'],semaforo:{2025:'amarillo',2026:'rojo',2027:'rojo',2028:'rojo'},
+     tareas:{2025:[{mes:0,t:'Diseñar plan de estructura organizacional'},{mes:2,t:'Identificar brechas de dotación por área'},{mes:5,t:'Gestionar contratación de especialistas (psicólogo, trabajador social)'},{mes:8,t:'Incorporar nutricionista al equipo'},{mes:11,t:'Informe dotación cubierta vs óptima 2025'}],2026:[{mes:1,t:'Contratos personal apoyo formalizados'},{mes:11,t:'Evaluación desempeño personal apoyo'}],2027:[{mes:3,t:'Revisión estructura organizacional'}],2028:[{mes:11,t:'Informe final RRHH cuatrienio'}]}},
+    {id:'OE7',nombre:'Inducción Académica y Administrativa',responsable:['Jef. Estudio'],indicadores:['% Participación en inducción','N° encuestas evaluación','Instructivo aprobado'],semaforo:{2025:'verde',2026:'amarillo',2027:'amarillo',2028:'rojo'},
+     tareas:{2025:[{mes:0,t:'Crear instructivo de inducción académica-administrativa'},{mes:1,t:'Implementar actividades inducción inicio de año'},{mes:2,t:'Evaluar proceso de inducción con plataforma digital'},{mes:6,t:'Inducción semestral 2do semestre'},{mes:11,t:'Informe anual proceso de inducción'}],2026:[{mes:1,t:'Ajuste contenidos según retroalimentación 2025'},{mes:11,t:'Evaluación satisfacción inducción >80%'}],2027:[{mes:0,t:'Revisión anual instructivo de inducción'}],2028:[{mes:11,t:'Evaluación impacto inducción 4 años'}]}},
+    {id:'OE8',nombre:'Estándares Infraestructura por Sede',responsable:['Subdirector Académico','Cmte. Grupos'],indicadores:['Ficha infraestructura elaborada','N° proyectos mejora/año','% Cumplimiento estándar'],semaforo:{2025:'amarillo',2026:'amarillo',2027:'rojo',2028:'rojo'},
+     tareas:{2025:[{mes:0,t:'Diseñar plan maestro de infraestructura y equipamiento'},{mes:1,t:'Elaborar ficha óptima por sede'},{mes:3,t:'Reunión coordinación sedes N°1'},{mes:7,t:'Reunión coordinación sedes N°2'},{mes:11,t:'Informe estándares infraestructura 2025'}],2026:[{mes:5,t:'50% infraestructura nivel satisfactorio'},{mes:11,t:'Informe estandarización equipamiento'}],2027:[{mes:11,t:'70% proyectos ejecutados'}],2028:[{mes:11,t:'90% estándar cumplido 3 sedes'}]}},
+    {id:'OE9',nombre:'Optimizar Equipamiento y Muebles',responsable:['Cmte. Escuadrón Logístico'],indicadores:['% Cumplimiento plan mantenimiento','N° equipos reemplazados','N° reparaciones ejecutadas'],semaforo:{2025:'verde',2026:'amarillo',2027:'amarillo',2028:'rojo'},
+     tareas:{2025:[{mes:0,t:'Diseñar plan anual de mantenimiento y reparaciones'},{mes:1,t:'Actualizar inventario de equipos y muebles'},{mes:3,t:'Ejecución mantención preventiva N°1'},{mes:6,t:'Ejecución mantención preventiva N°2'},{mes:9,t:'Ejecución mantención preventiva N°3'},{mes:11,t:'Informe cumplimiento plan mantenimiento 2025'}],2026:[{mes:2,t:'Reemplazo equipos críticos'},{mes:11,t:'Reducción 30% equipos obsoletos'}],2027:[{mes:11,t:'90% equipos en estado óptimo'}],2028:[{mes:11,t:'100% cumplimiento plan mantención'}]}},
+    {id:'OE10',nombre:'Optimizar Infraestructura 3 Sedes',responsable:['Subdirector Académico','Dirección'],indicadores:['N° proyectos ejecutados/año','% Satisfacción infraestructura','N° m² intervenidos'],semaforo:{2025:'amarillo',2026:'rojo',2027:'rojo',2028:'rojo'},
+     tareas:{2025:[{mes:0,t:'Diagnóstico de infraestructura en las 3 sedes'},{mes:2,t:'Priorización de proyectos urgentes'},{mes:4,t:'Inicio proyectos de intervención prioritarios'},{mes:11,t:'Informe avance infraestructura 2025'}],2026:[{mes:8,t:'Laboratorios TI modernizados'},{mes:11,t:'Aulas interactivas sede central habilitadas'}],2027:[{mes:9,t:'Biblioteca física remodelada'}],2028:[{mes:11,t:'Certificación espacios y evaluación final'}]}},
+    {id:'OE11',nombre:'Protocolo Ley 21.369 (Acoso/Género)',responsable:['Of. Gestión Convivencia','Dirección'],indicadores:['Oficina creada (S/N)','N° capacitaciones/semestre','% Comunidad capacitada'],semaforo:{2025:'verde',2026:'amarillo',2027:'amarillo',2028:'rojo'},
+     tareas:{2025:[{mes:0,t:'Crear Oficina de Gestión de la Convivencia y Equidad de Género'},{mes:1,t:'Diseñar protocolo interno Ley 21.369'},{mes:2,t:'Aprobación protocolo por dirección'},{mes:4,t:'Capacitación N°1 comunidad educativa Ley 21.369'},{mes:9,t:'Capacitación N°2 comunidad educativa Ley 21.369'},{mes:11,t:'Informe anual Ley 21.369 y casos atendidos'}],2026:[{mes:5,t:'Canal de denuncia operativo y difundido'},{mes:11,t:'Informe anual protocolo y estadísticas'}],2027:[{mes:3,t:'Evaluación impacto protocolo'}],2028:[{mes:5,t:'Protocolo auditado externamente'}]}}
+   ]},
+  {id:'E3',num:'III',nombre:'Aseguramiento de Calidad',color:'#6a1b9a',icon:'✅',
+   objetivos:[
+    {id:'OE12',nombre:'Herramienta Control PDE (KPI)',responsable:['Of. Aseguramiento Calidad'],indicadores:['Plataforma KPI operativa','N° KPIs activos por área','% Informes generados vs programados'],semaforo:{2025:'verde',2026:'amarillo',2027:'amarillo',2028:'rojo'},
+     tareas:{2025:[{mes:0,t:'Diseñar plataforma de control de gestión con KPIs'},{mes:1,t:'Definir parámetros KPI aprobados por mando directivo'},{mes:3,t:'Programar cuadro de mando integral (CMI)'},{mes:5,t:'Pruebas piloto plataforma CMI'},{mes:7,t:'Lanzamiento oficial plataforma CMI'},{mes:9,t:'1er informe trimestral con CMI'},{mes:11,t:'Informe anual de gestión y cumplimiento PDE'}],2026:[{mes:0,t:'100% áreas con KPIs activos'},{mes:11,t:'Evaluación efectividad CMI año 2'}],2027:[{mes:8,t:'Alertas tempranas de incumplimiento activas'}],2028:[{mes:11,t:'Informe final CMI cuatrienio'}]}},
+    {id:'OE13',nombre:'Evaluación Misión-Visión-Propósitos',responsable:['Of. Aseguramiento Calidad'],indicadores:['N° autoevaluaciones/año','N° jornadas socialización/año','N° seminarios institucionales'],semaforo:{2025:'verde',2026:'amarillo',2027:'amarillo',2028:'rojo'},
+     tareas:{2025:[{mes:0,t:'Capacitar agentes relevantes en aseguramiento de calidad'},{mes:1,t:'Desarrollar proceso de autoevaluación institucional N°1'},{mes:2,t:'Reunión Comité de Autoevaluación N°1'},{mes:4,t:'Jornada socialización comunidad educativa N°1'},{mes:6,t:'Reunión Comité de Autoevaluación N°2'},{mes:7,t:'Seminario institucional Misión-Visión-Propósitos'},{mes:11,t:'Informe anual evaluación Misión-Visión-Propósitos'}],2026:[{mes:7,t:'Seminario institucional 2026'},{mes:11,t:'Informe ajuste misión-visión'}],2027:[{mes:3,t:'Evaluación externa complementaria'}],2028:[{mes:11,t:'Autoevaluación institucional completa cuatrienio'}]}},
+    {id:'OE14',nombre:'Evaluación Políticas Educativas',responsable:['Of. Aseguramiento Calidad','Subdirección Académica'],indicadores:['N° políticas evaluadas/año','N° mesas trabajo realizadas','N° informes impacto generados'],semaforo:{2025:'verde',2026:'amarillo',2027:'rojo',2028:'rojo'},
+     tareas:{2025:[{mes:0,t:'Crear y aprobar mecanismo de evaluación de políticas educativas'},{mes:2,t:'Mesa de trabajo política educativa N°1'},{mes:5,t:'Aplicar mecanismo de evaluación 1ra vez'},{mes:6,t:'Mesa de trabajo política educativa N°2'},{mes:9,t:'Analizar efectos de políticas implementadas'},{mes:11,t:'Informe de medición de impacto 2025'}],2026:[{mes:8,t:'Informe ajuste políticas con evidencia'},{mes:11,t:'Difusión resultados a comunidad'}],2027:[{mes:10,t:'Propuesta nuevas políticas basadas en evidencia'}],2028:[{mes:11,t:'Informe final evaluación políticas cuatrienio'}]}}
+   ]},
+  {id:'E4',num:'IV',nombre:'Vinculación con el Medio',color:'#b71c1c',icon:'🌐',
+   objetivos:[
+    {id:'OE15',nombre:'Articular Actividades VcM con Formación',responsable:['Of. VcM','Jef. Estudio'],indicadores:['N° alianzas activas por sede','% Docentes en actividades VcM','% Estudiantes en actividades VcM'],semaforo:{2025:'amarillo',2026:'amarillo',2027:'amarillo',2028:'rojo'},
+     tareas:{2025:[{mes:0,t:'Actualizar Política de Vinculación con el Medio'},{mes:1,t:'Identificar grupos de interés del medio externo'},{mes:2,t:'Establecer 1ra alianza estratégica sede central'},{mes:3,t:'Actividad transversal N°1 VcM (todas las sedes)'},{mes:5,t:'Encuesta satisfacción participantes iniciativa N°1'},{mes:7,t:'Actividad transversal N°2 VcM (todas las sedes)'},{mes:9,t:'Encuesta satisfacción participantes iniciativa N°2'},{mes:11,t:'Informe final resultados VcM 2025'}],2026:[{mes:6,t:'40% estudiantes en actividades VcM'},{mes:11,t:'Informe anual contribución VcM'}],2027:[{mes:9,t:'50% estudiantes en VcM'}],2028:[{mes:11,t:'Informe final VcM cuatrienio'}]}}
+   ]},
+  {id:'E5',num:'V',nombre:'Creación e Innovación',color:'#e65100',icon:'💡',
+   objetivos:[
+    {id:'OE16',nombre:'Articular Innovación con Proceso Formativo',responsable:['Of. Innovación','Jef. Estudio'],indicadores:['N° proyectos innovación/año','N° alianzas externas innovación','% Asignaturas con apoyo innovador'],semaforo:{2025:'amarillo',2026:'amarillo',2027:'rojo',2028:'rojo'},
+     tareas:{2025:[{mes:0,t:'Elaborar y aprobar instructivo Oficina de Innovación'},{mes:1,t:'Jornada de socialización innovación educativa N°1'},{mes:2,t:'Desarrollar mecanismos internos de sistematización'},{mes:3,t:'Desarrollar 1er proyecto de innovación formativa'},{mes:5,t:'Reunión con instituciones externas para innovación'},{mes:7,t:'Actividad transversal innovación (todas las sedes)'},{mes:8,t:'Presentar proyecto fondos concursables N°1'},{mes:9,t:'Benchmarking con institución de educación superior'},{mes:10,t:'Presentar proyecto fondos concursables N°2'},{mes:11,t:'Informe anual innovación y resultados 2025'}],2026:[{mes:5,t:'50% asignaturas con apoyo innovador'},{mes:11,t:'2 mecanismos de apoyo formativo implementados'}],2027:[{mes:9,t:'Plataforma tecnológica en desarrollo'}],2028:[{mes:11,t:'Informe final innovación cuatrienio'}]}}
+   ]}
+];
+
+// ══════════════════════════════════════════════════════
+// API HELPERS
+// ══════════════════════════════════════════════════════
+async function api(method, path, body=null) {
+  const opts = {method, headers:{'Content-Type':'application/json'}};
+  if(body) opts.body = JSON.stringify(body);
+  const r = await fetch('/api'+path, opts);
+  if(r.status===401){window.location.href='/login';return null;}
+  return r.json();
+}
+
+async function apiForm(path, formData) {
+  const r = await fetch('/api'+path, {method:'POST', body:formData});
+  if(r.status===401){window.location.href='/login';return null;}
+  return r.json();
+}
+
+function tkey(ejeId,objId,year,mesIdx,tareaIdx){return `${ejeId}_${objId}_${year}_${mesIdx}_${tareaIdx}`;}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+async function init() {
+  ME = await api('GET','/me');
+  if(!ME){window.location.href='/login';return;}
+  // Actualizar cabecera usuario
+  document.getElementById('userNombre').textContent = ME.nombre;
+  document.getElementById('userRol').textContent = '· '+ME.rol;
+  document.getElementById('rolDot').style.background = ROL_COLOR[ME.rol]||'#888';
+  if(ME.rol==='auditor') document.getElementById('auditPendPanel').style.display='block';
+  await loadAndRender();
+  document.getElementById('fechaPie').textContent='Sistema activo: '+new Date().toLocaleDateString('es-CL',{year:'numeric',month:'long',day:'numeric'});
+}
+
+async function loadAndRender() {
+  await loadTareas(CY);
+  if(ME.rol==='auditor') await loadPendientes();
+  renderKPIs();
+  renderAuditorBar();
+  renderAlertas();
+  renderTabs();
+  renderPaneles();
+  activateEje(ACTIVE_EJE);
+  document.getElementById('badgeYr').textContent=CY;
+}
+
+async function loadTareas(year) {
+  const data = await api('GET',`/tareas?year=${year}`);
+  TAREAS_DB = {};
+  if(data) data.forEach(t=>{ TAREAS_DB[t.tarea_key]=t; });
+}
+
+async function loadPendientes() {
+  const dash = await api('GET',`/dashboard?year=${CY}`);
+  const list = document.getElementById('pendList');
+  if(!dash||!dash.pendientes_auditoria.length){
+    list.innerHTML='<span style="font-size:12px;color:var(--texto)">Sin evidencias pendientes de validación.</span>';
+    return;
+  }
+  list.innerHTML = dash.pendientes_auditoria.map(p=>`
+    <div class="pa-item">
+      <span class="pa-key">${p.tarea_key}</span>
+      <span class="pa-desc">${p.descripcion||'—'} ${p.archivo_orig?'<span style="color:#3498db">📄 '+p.archivo_orig+'</span>':''}</span>
+      <span class="pa-fecha">${(p.enviado_en||'').substring(0,16)}</span>
+      <button class="btn btn-ok" onclick="openValidar('${p.tarea_key}')">✓ Validar</button>
+      <button class="btn btn-no" onclick="openRechazar('${p.tarea_key}')">✕ Rechazar</button>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// YEAR
+// ══════════════════════════════════════════════════════
+async function setYear(yr,btn){
+  CY=yr;
+  document.querySelectorAll('.btn-yr').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  await loadAndRender();
+}
+
+// ══════════════════════════════════════════════════════
+// AVANCE (basado en tareas validadas)
+// ══════════════════════════════════════════════════════
+function getAvanceObj(eje,obj,year){
+  const tareas=obj.tareas[year]||[];
+  if(!tareas.length) return 0;
+  let v=0;
+  tareas.forEach((t,ti)=>{
+    const k=tkey(eje.id,obj.id,year,t.mes,ti);
+    if(TAREAS_DB[k]?.estado==='validada') v++;
+  });
+  return Math.round(v/tareas.length*100);
+}
+function getAvanceEje(eje,year){
+  if(!eje.objetivos.length) return 0;
+  return Math.round(eje.objetivos.reduce((s,o)=>s+getAvanceObj(eje,o,year),0)/eje.objetivos.length);
+}
+function getConteoEstados(year){
+  let p=0,e=0,v=0,r=0;
+  EJES.forEach(eje=>eje.objetivos.forEach(obj=>{
+    (obj.tareas[year]||[]).forEach((t,ti)=>{
+      const k=tkey(eje.id,obj.id,year,t.mes,ti);
+      const est=TAREAS_DB[k]?.estado||'pendiente';
+      if(est==='pendiente')p++;else if(est==='enviada')e++;else if(est==='validada')v++;else r++;
+    });
+  }));
+  return{p,e,v,r};
+}
+
+// ══════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════
+function renderAuditorBar(){
+  const c=getConteoEstados(CY);
+  document.getElementById('audStats').innerHTML=`
+    <div class="a-stat"><div class="a-val" style="color:#8b949e">${c.p}</div><div class="a-lbl">Pendientes</div></div>
+    <div class="a-stat"><div class="a-val" style="color:#3498db">${c.e}</div><div class="a-lbl">En Revisión</div></div>
+    <div class="a-stat"><div class="a-val" style="color:#3ecf74">${c.v}</div><div class="a-lbl">Validadas</div></div>
+    <div class="a-stat"><div class="a-val" style="color:#e74c3c">${c.r}</div><div class="a-lbl">Rechazadas</div></div>`;
+}
+
+function renderKPIs(){
+  document.getElementById('kpiGrid').innerHTML=EJES.map(e=>{
+    const av=getAvanceEje(e,CY);
+    return `<div class="kpi-card" style="--ce:${e.color}">
+      <div class="kpi-eje">${e.icon} ${e.num} · ${e.nombre}</div>
+      <div class="kpi-val">${av}%</div>
+      <div class="kpi-lbl">${e.objetivos.length} objetivos · ${CY}</div>
+      <div class="kpi-bar"><div class="kpi-fill" style="width:${av}%"></div></div>
+    </div>`;}).join('');
+}
+
+function renderAlertas(){
+  let sg=0,sy=0,sr=0;
+  EJES.forEach(e=>e.objetivos.forEach(o=>{const s=o.semaforo[CY];if(s==='verde')sg++;else if(s==='amarillo')sy++;else sr++;}));
+  const c=getConteoEstados(CY);
+  document.getElementById('alertas').innerHTML=[
+    {cls:'a-g',i:'✓',t:`${sg} objetivo(s) en plazo · semáforo verde`},
+    {cls:'a-y',i:'◔',t:`${sy} objetivo(s) en proceso · riesgo de retraso`},
+    {cls:'a-r',i:'⚠',t:`${sr} objetivo(s) pendiente(s) de iniciar`},
+    {cls:'a-b',i:'🔍',t:`${c.e} evidencia(s) esperando validación del auditor`},
+  ].map(a=>`<div class="alerta ${a.cls}"><span>${a.i}</span><span>${a.t}</span></div>`).join('');
+}
+
+function renderTabs(){
+  document.getElementById('ejeTabs').innerHTML=EJES.map((e,i)=>
+    `<div class="tab${i===ACTIVE_EJE?' active':''}" style="--ce:${e.color}" onclick="activateEje(${i})">${e.icon} ${e.num}. ${e.nombre}</div>`
+  ).join('');
+}
+
+function activateEje(idx){
+  ACTIVE_EJE=idx;
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.classList.toggle('active',i===idx);
+    t.style.setProperty('--ce',EJES[i].color);
+  });
+  document.querySelectorAll('.eje-panel').forEach((p,i)=>p.classList.toggle('active',i===idx));
+}
+
+function renderPaneles(){
+  document.getElementById('ejePaneles').innerHTML=EJES.map((eje,idx)=>{
+    const avEje=getAvanceEje(eje,CY);
+    // prog strip
+    const progStrip=`<div class="prog-row">${[2025,2026,2027,2028].map(yr=>{
+      const av=getAvanceEje(eje,yr);
+      return `<div class="prog-item" style="--ce:${eje.color};${yr===CY?'border:1px solid '+eje.color:''}">
+        <div class="prog-yr">${yr}${yr===CY?' ★':''}</div>
+        <div class="prog-val">${av}%</div>
+        <div class="prog-bar"><div class="prog-fill" style="width:${av}%"></div></div>
+      </div>`;}).join('')}</div>`;
+
+    const objsHtml=eje.objetivos.map(obj=>{
+      const av=getAvanceObj(eje,obj,CY);
+      const tareas=obj.tareas[CY]||[];
+      const validadas=tareas.filter((_,ti)=>TAREAS_DB[tkey(eje.id,obj.id,CY,tareas[ti].mes,ti)]?.estado==='validada').length;
+      const enviadas=tareas.filter((_,ti)=>TAREAS_DB[tkey(eje.id,obj.id,CY,tareas[ti].mes,ti)]?.estado==='enviada').length;
+      const sid=`${eje.id}_${obj.id}`;
+      const sc=obj.semaforo[CY];
+      return `
+        <div class="obj-card" style="--ce:${eje.color}">
+          <div class="obj-hdr" onclick="toggleObj('${sid}')">
+            <span class="obj-num">${obj.id}</span>
+            <span class="obj-nombre">${obj.nombre}</span>
+            ${enviadas?`<span style="font-size:10px;color:#3498db;background:rgba(52,152,219,.1);border:1px solid rgba(52,152,219,.3);padding:1px 7px;border-radius:99px">${enviadas} en revisión</span>`:''}
+            <span class="obj-cnt">${validadas}/${tareas.length} validadas</span>
+            <span class="obj-av">${av}%</span>
+            <span class="sem ${sc==='verde'?'sg':sc==='amarillo'?'sy':'sr'}">${sc==='verde'?'● En plazo':sc==='amarillo'?'● En proceso':'● Pendiente'}</span>
+            <span class="chev" id="chev_${sid}">▶</span>
+          </div>
+          <div class="obj-body" id="body_${sid}">
+            <div class="info-grid">
+              <div class="ib"><div class="ib-t">Responsables</div>
+                ${obj.responsable.map(r=>`<span class="rbadge">${r}</span>`).join('')}
+                <span class="rbadge" style="border-color:rgba(106,27,154,.4);color:#9c27b0">🔍 Auditor: Of. Aseg. Calidad</span>
+              </div>
+              <div class="ib"><div class="ib-t">Indicadores Clave</div>
+                ${obj.indicadores.map(i=>`<div class="ind-item">${i}</div>`).join('')}
+              </div>
+            </div>
+            ${renderTrimestres(eje,obj,CY)}
+          </div>
+        </div>`;}).join('');
+
+    return `<div class="eje-panel${idx===0?' active':''}" id="panel_${eje.id}" style="--ce:${eje.color}">
+      <div class="eje-hdr" style="--ce:${eje.color}">
+        <div class="eje-num">${eje.icon} ${eje.num}</div>
+        <div><h2>EJE ESTRATÉGICO ${eje.num}: ${eje.nombre.toUpperCase()}</h2>
+          <p>${eje.objetivos.length} Objetivos · ${eje.objetivos.reduce((a,o)=>a+(o.tareas[CY]||[]).length,0)} tareas año ${CY} · Avance global: ${avEje}%</p></div>
+      </div>
+      ${progStrip}${objsHtml}</div>`;
+  }).join('');
+}
+
+function renderTrimestres(eje,obj,year){
+  const tareas=obj.tareas[year]||[];
+  if(!tareas.length) return '<p style="color:var(--texto);font-size:12px;padding:8px 0">Sin tareas programadas para este año.</p>';
+  const trs=[{l:'T1 · Ene–Mar',m:[0,1,2]},{l:'T2 · Abr–Jun',m:[3,4,5]},{l:'T3 · Jul–Sep',m:[6,7,8]},{l:'T4 · Oct–Dic',m:[9,10,11]}];
+  const sid=`${eje.id}_${obj.id}`;
+  let html='<div class="tr-tabs">';
+  let firstActive=-1;
+  trs.forEach((tr,ti)=>{
+    const has=tareas.some(t=>tr.m.includes(t.mes));
+    if(has){
+      if(firstActive<0)firstActive=ti;
+      html+=`<div class="tr-tab${firstActive===ti?' active':''}" id="trtab_${sid}_${ti}" onclick="switchTr('${sid}',${ti})">${tr.l}</div>`;
+    }
+  });
+  html+='</div>';
+  trs.forEach((tr,ti)=>{
+    const tlist=tareas.filter(t=>tr.m.includes(t.mes));
+    if(!tlist.length) return;
+    html+=`<div class="tr-body${ti===firstActive?' open':''}" id="trbody_${sid}_${ti}">`;
+    tlist.forEach(t=>{
+      const tIdx=tareas.indexOf(t);
+      const k=tkey(eje.id,obj.id,year,t.mes,tIdx);
+      const est=TAREAS_DB[k]?.estado||'pendiente';
+      let cls='';
+      if(est==='validada')cls='validada';else if(est==='enviada')cls='enviada';else if(est==='rechazada')cls='rechazada';
+      const estLabel={pendiente:'Pendiente',enviada:'📎 En Revisión',validada:'✓ Validada',rechazada:'✕ Rechazada'};
+      const estCls={pendiente:'ep',enviada:'ee',validada:'ev',rechazada:'er'};
+      let acciones='';
+      const canUpload=(ME.rol==='responsable'&&(est==='pendiente'||est==='rechazada'))||ME.rol==='auditor';
+      if(canUpload) acciones+=`<button class="btn btn-up" onclick="openSubirEvidencia('${k}','${eje.id}','${obj.id}',${year},${t.mes},${tIdx})">📎 Subir</button>`;
+      if(ME.rol==='auditor'&&est==='enviada'){
+        acciones+=`<button class="btn btn-ok" onclick="openValidar('${k}')">✓</button>`;
+        acciones+=`<button class="btn btn-no" onclick="openRechazar('${k}')">✕</button>`;
+      }
+      acciones+=`<button class="btn btn-see" onclick="openDetalle('${k}')">👁</button>`;
+      html+=`<div class="tarea ${cls}" id="tarea_${k}">
+        <div class="t-row">
+          <div class="t-content">
+            <div class="t-texto">${t.t}</div>
+            <div class="t-meta">
+              <span class="t-mes">${MESES[t.mes]}</span>
+              <span class="t-est ${estCls[est]}">${estLabel[est]}</span>
+            </div>
+          </div>
+          <div class="t-actions">${acciones}</div>
+        </div></div>`;
+    });
+    html+='</div>';
+  });
+  return html;
+}
+
+// ══════════════════════════════════════════════════════
+// TOGGLE / SWITCH
+// ══════════════════════════════════════════════════════
+function toggleObj(sid){
+  const b=document.getElementById('body_'+sid);
+  const c=document.getElementById('chev_'+sid);
+  if(!b) return;
+  const open=b.classList.toggle('open');
+  if(c) c.textContent=open?'▼':'▶';
+}
+function switchTr(sid,ti){
+  for(let i=0;i<4;i++){
+    document.getElementById(`trtab_${sid}_${i}`)?.classList.remove('active');
+    document.getElementById(`trbody_${sid}_${i}`)?.classList.remove('open');
+  }
+  document.getElementById(`trtab_${sid}_${ti}`)?.classList.add('active');
+  document.getElementById(`trbody_${sid}_${ti}`)?.classList.add('open');
+}
+
+// ══════════════════════════════════════════════════════
+// MODALES
+// ══════════════════════════════════════════════════════
+function openModal(html,color='var(--verde)'){
+  document.getElementById('mContent').innerHTML=html;
+  document.getElementById('mbox').style.setProperty('--ce',color);
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+}
+
+function openSubirEvidencia(k,ejeId,objId,year,mes,tIdx){
+  const eje=EJES.find(e=>e.id===ejeId);
+  openModal(`
+    <div class="m-title" style="color:#3498db">📎 Subir Evidencia</div>
+    <div class="m-sub">Tarea · ${MESES[mes]} ${year} · ${ejeId} / ${objId}</div>
+    <label class="flabel">Descripción de la evidencia *</label>
+    <textarea id="evDesc" placeholder="Describa la evidencia: acciones realizadas, resultados, documentos adjuntos..."></textarea>
+    <label class="flabel">Archivo adjunto (opcional · máx. 20 MB)</label>
+    <div class="file-row">
+      <input type="file" id="evFile" style="display:none" onchange="document.getElementById('evFN').textContent=this.files[0]?.name||'Sin archivo'">
+      <button class="btn btn-up" onclick="document.getElementById('evFile').click()">📁 Seleccionar</button>
+      <span class="fname" id="evFN">Sin archivo seleccionado</span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-send" onclick="enviarEvidencia('${k}','${ejeId}','${objId}',${year},${mes},${tIdx})">Enviar al Auditor →</button>
+      <button class="btn btn-see" onclick="closeModal()">Cancelar</button>
+    </div>`,eje?.color||'#3498db');
+}
+
+async function enviarEvidencia(k,ejeId,objId,year,mes,tIdx){
+  const desc=document.getElementById('evDesc').value.trim();
+  if(!desc){toast('Escriba la descripción de la evidencia','err');return;}
+  const fd=new FormData();
+  fd.append('tarea_key',k);fd.append('eje_id',ejeId);fd.append('obj_id',objId);
+  fd.append('year',year);fd.append('mes_idx',mes);fd.append('tarea_idx',tIdx);
+  fd.append('descripcion',desc);
+  const fInput=document.getElementById('evFile');
+  if(fInput.files[0]) fd.append('archivo',fInput.files[0]);
+  const r=await apiForm('/evidencia',fd);
+  if(!r) return;
+  if(r.ok){toast('Evidencia enviada al auditor ✓','ok');closeModal();await loadAndRender();}
+  else toast(r.error||'Error al enviar','err');
+}
+
+function openValidar(k){
+  openModal(`
+    <div class="m-title" style="color:#3ecf74">✓ Validar Evidencia</div>
+    <div class="m-sub">Auditor: Oficina de Aseguramiento de la Calidad<br>Clave: ${k}</div>
+    <label class="flabel">Observaciones de validación (opcional)</label>
+    <textarea id="audObs" placeholder="Ingrese comentarios u observaciones sobre la validación..."></textarea>
+    <div style="display:flex;gap:8px">
+      <button class="btn-send green" onclick="registrarAuditoria('${k}','validada')">✓ Confirmar Validación</button>
+      <button class="btn btn-see" onclick="closeModal()">Cancelar</button>
+    </div>`,'#2d9a5a');
+}
+
+function openRechazar(k){
+  openModal(`
+    <div class="m-title" style="color:#e74c3c">✕ Rechazar Evidencia</div>
+    <div class="m-sub">Auditor: Oficina de Aseguramiento de la Calidad<br>Clave: ${k}</div>
+    <label class="flabel">Motivo del rechazo *</label>
+    <textarea id="audObs" placeholder="Indique el motivo y qué debe corregir el responsable para volver a enviar..." style="border-color:rgba(231,76,60,.4)"></textarea>
+    <div style="display:flex;gap:8px">
+      <button class="btn-send red" onclick="registrarAuditoria('${k}','rechazada')">✕ Confirmar Rechazo</button>
+      <button class="btn btn-see" onclick="closeModal()">Cancelar</button>
+    </div>`,'#c0392b');
+}
+
+async function registrarAuditoria(k,accion){
+  const obs=document.getElementById('audObs').value.trim();
+  if(accion==='rechazada'&&!obs){toast('Debe indicar el motivo del rechazo','err');return;}
+  const r=await api('POST','/auditoria',{tarea_key:k,accion,observacion:obs});
+  if(!r) return;
+  if(r.ok){toast(accion==='validada'?'Evidencia validada ✓':'Evidencia rechazada','ok');closeModal();await loadAndRender();}
+  else toast(r.error||'Error','err');
+}
+
+async function openDetalle(k){
+  const d=await api('GET',`/tareas/${encodeURIComponent(k)}`);
+  if(!d){toast('Error al cargar detalle','err');return;}
+  const eje=EJES.find(e=>e.objetivos.some(o=>k.startsWith(e.id)));
+  let html=`<div class="m-title">👁 Detalle de Tarea</div><div class="m-sub" style="word-break:break-all">${k}</div>`;
+  if(d.evidencias.length){
+    html+=`<div style="font-size:10px;color:#3498db;text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:7px">📎 Evidencias (${d.evidencias.length})</div>`;
+    d.evidencias.forEach(e=>{
+      html+=`<div style="background:rgba(52,152,219,.07);border:1px solid rgba(52,152,219,.2);border-radius:5px;padding:9px 11px;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:600;margin-bottom:3px">${e.responsable_nombre} · <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--texto)">${(e.enviado_en||'').substring(0,16)}</span></div>
+        <div style="font-size:12px;margin-bottom:4px">${e.descripcion}</div>
+        ${e.archivo_orig?`<a href="/api/archivo/${e.archivo_uuid}" style="color:#3498db;font-size:11px" target="_blank">📄 ${e.archivo_orig}</a>`:''}
+      </div>`;
+    });
+  }
+  if(d.auditorias.length){
+    html+=`<div style="font-size:10px;color:#9c27b0;text-transform:uppercase;letter-spacing:1px;font-weight:600;margin:10px 0 7px">🔍 Auditorías (${d.auditorias.length})</div>`;
+    d.auditorias.forEach(a=>{
+      const col=a.accion==='validada'?'#3ecf74':'#e74c3c';
+      html+=`<div class="obs-item" style="border-color:${col}">
+        <div style="font-size:10px;color:var(--texto)">${a.accion.toUpperCase()} · ${a.auditor_nombre} · ${(a.fecha||'').substring(0,16)}</div>
+        <div style="font-size:11px;color:${col}">${a.observacion||'Sin observaciones'}</div>
+      </div>`;
+    });
+  }
+  if(d.historial.length){
+    html+=`<div style="font-size:10px;color:var(--texto);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin:10px 0 7px">Historial</div>`;
+    d.historial.forEach(h=>{
+      html+=`<div class="hist-item"><span class="hist-date">${(h.fecha||'').substring(0,16)}</span><span>${h.detalle}</span></div>`;
+    });
+  }
+  if(!d.evidencias.length&&!d.auditorias.length&&!d.historial.length){
+    html+=`<div style="font-size:12px;color:var(--texto);margin-top:12px">Sin actividad registrada aún.</div>`;
+  }
+  openModal(html,eje?.color||'var(--verde)');
+}
+
+// TOAST
+function toast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// LOGOUT
+async function doLogout(){
+  await api('POST','/logout');
+  window.location.href='/login';
+}
+
+init();
+</script>
+</body>
+</html>
